@@ -289,6 +289,164 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/21/Es学习文档/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wilsonJwz">
+      <meta itemprop="description" content="欢迎来到wilsonJwz的博客">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="WilsonJ">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                
+                <a href="/2019/05/21/Es学习文档/" class="post-title-link" itemprop="url">Unbenannt</a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Veröffentlicht am</span>
+              
+
+              
+                
+              
+
+              <time title="Erstellt: 2019-05-21 11:54:21" itemprop="dateCreated datePublished" datetime="2019-05-21T11:54:21+08:00">2019-05-21</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Bearbeitet am</span>
+                
+                <time title="Geändert am: 2019-05-14 15:19:30" itemprop="dateModified" datetime="2019-05-14T15:19:30+08:00">2019-05-14</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="Elasticsearch最佳实践"><a href="#Elasticsearch最佳实践" class="headerlink" title="Elasticsearch最佳实践"></a>Elasticsearch最佳实践</h3><h5 id="1-1逻辑组织"><a href="#1-1逻辑组织" class="headerlink" title="1.1逻辑组织"></a>1.1逻辑组织</h5><p>​        Elasticsearch同样具有这样的概念，如下图所示，使用<strong>index</strong>和<strong>doc_type</strong>来组织数据。doc_type中的每条数据称为一个<strong>document</strong>，是一个JSON Object，相关的schema信息通过<strong>mapping</strong>来定义。es建议一个index只拥有一个doc_type。</p>
+<p><img src="https://img-blog.csdnimg.cn/20181115143353812.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3p3Z2RmdA==,size_30,color_FFFFFF,t_70" alt="123"></p>
+<h5 id="1-2-物理组织"><a href="#1-2-物理组织" class="headerlink" title="1.2 物理组织"></a>1.2 物理组织</h5><p>ElasticSearch 会将每个index划分到不同的数据块中，然后将不同的数据块分配到不同的节点。分布式前提：<strong>接受系统中某个节点因为某些故障退出。</strong>所以shard会有两种，一种是<strong>primary</strong> <strong>shard ** 和 **replica shard</strong> 数据会首先写入primary shard，然后同步到replica shard中。</p>
+<p><img src="https://img-blog.csdnimg.cn/20181114095024482.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3p3Z2RmdA==,size_40,color_ffFFFF,t_70" alt></p>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/21/hello-world/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -467,7 +625,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">1</span>
+                    <span class="site-state-item-count">2</span>
                     <span class="site-state-item-name">Artikel</span>
                   </a>
                 </div>
