@@ -1,0 +1,211 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>文章列表 on WilsonJ Blog</title>
+		<link>https://example.com/posts/</link>
+		<description>Recent content in 文章列表 on WilsonJ Blog</description>
+		<generator>Hugo -- gohugo.io</generator>
+		<language>en-us</language>
+		<copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
+		<lastBuildDate>Fri, 04 Dec 2020 11:29:59 +0800</lastBuildDate>
+		<atom:link href="https://example.com/posts/index.xml" rel="self" type="application/rss+xml" />
+		
+		<item>
+			<title>Golang Error</title>
+			<link>https://example.com/posts/golang/error/</link>
+			<pubDate>Fri, 04 Dec 2020 11:29:59 +0800</pubDate>
+			
+			<guid>https://example.com/posts/golang/error/</guid>
+			<description>Error的几种定义 Error are value Sentinel Error 预定义错误 Sentinel errors 成为你 API 公共部分。 Sentinel errors 在两个包之间创建了依赖。 结论: 尽可能避免 sentinel errors。 Error Types Error type 是实现了 error</description>
+			<content type="html"><![CDATA[<h3 id="error的几种定义">Error的几种定义</h3>
+<p><strong>Error are value</strong></p>
+<h4 id="sentinel-error-预定义错误">Sentinel Error 预定义错误</h4>
+<ul>
+<li>Sentinel errors 成为你 API 公共部分。</li>
+<li>Sentinel errors 在两个包之间创建了依赖。</li>
+<li>结论: 尽可能避免 sentinel errors。</li>
+</ul>
+<h4 id="error-types">Error Types</h4>
+<p>Error type 是实现了 error 接口的自定义类型。</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">type</span> <span class="nx">MyError</span> <span class="kd">struct</span><span class="p">{</span>
+    <span class="nx">Msg</span> <span class="kt">string</span>
+    <span class="nx">File</span> <span class="kt">string</span>
+    <span class="nx">Line</span> <span class="kt">int</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nf">Error</span><span class="p">()</span> <span class="kt">string</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Sprintf</span><span class="p">(</span><span class="s">&#34;%s:%d %s&#34;</span><span class="p">,</span> <span class="nx">e</span><span class="p">.</span><span class="nx">File</span><span class="p">,</span> <span class="nx">e</span><span class="p">.</span><span class="nx">Line</span><span class="p">,</span> <span class="nx">e</span><span class="p">.</span><span class="nx">Msg</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nf">test</span><span class="p">()</span> <span class="nx">Error</span><span class="p">{</span>
+    <span class="k">return</span> <span class="o">&amp;</span><span class="nx">MyError</span><span class="p">{</span><span class="s">&#34;Something happened&#34;</span><span class="p">,</span> <span class="s">&#34;server.go&#34;</span><span class="p">,</span> <span class="mi">42</span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><p>因为 MyError 是一个 type，调用者可以使用断言转换成这个类型，来获取更多的上下文信息。</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">main</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nx">err</span> <span class="o">:=</span> <span class="nf">test</span><span class="p">()</span>
+    <span class="k">switch</span> <span class="nx">err</span><span class="o">:=</span> <span class="nx">err</span><span class="p">.(</span><span class="kd">type</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="kc">nil</span><span class="p">:</span>
+            <span class="c1">//call succeeded nothine to do
+</span><span class="c1"></span>        <span class="k">case</span> <span class="o">*</span><span class="nx">MyError</span><span class="p">:</span>
+            <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;error occurred on line&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">.</span><span class="nx">Line</span><span class="p">)</span>
+        <span class="k">default</span><span class="p">:</span>
+            <span class="c1">//unknown error
+</span><span class="c1"></span>    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><blockquote>
+<p>好处：与错误值相比，错误类型的一大改进是它们能够包装底层错误以提供更多上下文。</p>
+</blockquote>
+<p>调用者要使用类型断言和类型<code>switch</code>,就要让自定义的error变为public。这种模型会导致和调用者产生强耦合，从而导致API变得脆弱。
+结论：避免使用error types。</p>
+<h4 id="opaque-errors--不透明错误">Opaque errors  不透明错误</h4>
+<p>虽然你知道发生了错误，但是你没有能力看到错误的内部。作为调用者，关于操作的结果，您所知道的就是它起作用了，或者没有起作用(成功还是失败)，还有 <strong>不建议做内容匹配</strong></p>
+<blockquote>
+<p>这就是不透明错误处理的全部功能–只需返回错误而不假设其内容。</p>
+</blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="s">&#34;github/quux/bar&#34;</span>
+
+<span class="kd">func</span> <span class="nf">fn</span><span class="p">()</span> <span class="kt">error</span> <span class="p">{</span>
+    <span class="nx">x</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">bar</span><span class="p">.</span><span class="nf">Foo</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+        <span class="nx">retuen</span> <span class="nx">err</span>
+    <span class="p">}</span>
+    <span class="c1">// use x
+</span><span class="c1"></span><span class="p">}</span>
+</code></pre></div><p>还有一种情况，我们可以断言错误实现了特定的行为，而不是断言错误是特定的类型或值</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// temporary 暂时的
+</span><span class="c1"></span><span class="kd">type</span> <span class="nx">temporary</span> <span class="kd">interface</span><span class="p">{</span>
+    <span class="nf">Temporary</span><span class="p">()</span> <span class="kt">bool</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nf">IsTemporary</span><span class="p">(</span><span class="nx">err</span> <span class="kt">error</span><span class="p">)</span> <span class="kt">bool</span> <span class="p">{</span>  
+    <span class="nx">te</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">err</span><span class="p">.(</span><span class="nx">temporary</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nx">ok</span> <span class="o">&amp;&amp;</span> <span class="nx">te</span><span class="p">.</span><span class="nf">Temporary</span><span class="p">()</span>
+<span class="p">}</span>
+</code></pre></div><h3 id="warp-error">Warp Error</h3>
+<p>errors包 <code>github.com/pkg/errors</code>
+日志记录与错误无关且对调试没有帮助的信息应被视为噪音，应予以质疑。记录的原因是因为某些东西失败了，而日志包含了答案。</p>
+<pre><code>1.错误要被日志记录。
+2.应用程序处理错误，保证100%完整性。
+3.之后不再报告当前错误。
+</code></pre>
+<p>​</p>
+<h4 id="go-113之后">Go 1.13之后</h4>
+<p>新增了三个方法：分别是</p>
+<p><code>errors.Unwarp</code>    以简化处理处理包含的其他错误的错误</p>
+<p><code>errors.Is</code> 判断err是否属于某个错误类型</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">//类似于
+</span><span class="c1">// if err == ErrNotFound{...}
+</span><span class="c1"></span><span class="k">if</span> <span class="nx">errors</span><span class="p">.</span><span class="nf">Is</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">ErrNotFound</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">//某些东西找不到了 
+</span><span class="c1"></span><span class="p">}</span>
+</code></pre></div><p><code>errors.As</code></p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">//类似于
+</span><span class="c1">// if e,ok := err.(*QueryError); ok {...}
+</span><span class="c1"></span><span class="kd">var</span> <span class="nx">e</span> <span class="o">*</span><span class="nx">QueryError</span>
+<span class="c1">// 提示: 当前的error的类型是 *QueryError
+</span><span class="c1"></span><span class="k">if</span> <span class="nx">errors</span><span class="p">.</span><span class="nf">As</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// err是*QueryError类型
+</span><span class="c1"></span><span class="p">}</span>
+</code></pre></div><h3 id="go代码中的错误-只应当处理一次强调">GO代码中的错误 只应当处理一次（强调）</h3>
+<p>一般处理错误的方式：</p>
+<ol>
+<li>记录日志，然后错相关的处理。</li>
+<li>数据降级，给出默认值。</li>
+</ol>
+<p>作业：我们在数据库操作的时候，比如 dao 层中当遇到一个 sql.ErrNoRows 的时候，是否应该 Wrap 这个 error，抛给上层。为什么，应该怎么做请写出代码？</p>
+<p>答：应该，需要wrap当前错误，并且返回空值 跟 相关err出去。 等到service层 或者 controller层 处理当前错误（有可能是记录日志，有可能是直接返回默认值，即降级） 而且错误只应当处理一次。</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">main</span>
+
+<span class="kn">import</span> <span class="p">(</span>
+	<span class="nx">stdErrors</span> <span class="s">&#34;errors&#34;</span>
+	<span class="s">&#34;fmt&#34;</span>
+	<span class="s">&#34;github.com/pkg/errors&#34;</span>
+	<span class="s">&#34;math/rand&#34;</span>
+	<span class="s">&#34;time&#34;</span>
+<span class="p">)</span>
+
+<span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nf">logic</span><span class="p">()</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nf">kitUser</span><span class="p">()</span> <span class="p">(</span><span class="kt">int</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">rand</span><span class="p">.</span><span class="nf">Seed</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nf">Now</span><span class="p">().</span><span class="nf">Unix</span><span class="p">())</span>
+	<span class="nx">randNum</span> <span class="o">:=</span> <span class="nx">rand</span><span class="p">.</span><span class="nf">Intn</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+	<span class="k">if</span> <span class="nx">randNum</span> <span class="o">&lt;=</span> <span class="mi">5</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">stdErrors</span><span class="p">.</span><span class="nf">New</span><span class="p">(</span><span class="s">&#34;query happened error&#34;</span><span class="p">)</span>
+	<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="nx">randNum</span><span class="p">,</span> <span class="kc">nil</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nf">UserRepo</span><span class="p">()</span> <span class="p">(</span><span class="kt">int</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">count</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nf">kitUser</span><span class="p">()</span>
+	<span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">errors</span><span class="p">.</span><span class="nf">Wrap</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="s">&#34;don&#39;t find any user&#34;</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="nx">count</span><span class="p">,</span> <span class="nx">err</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nf">service</span><span class="p">()</span> <span class="p">(</span><span class="kt">int</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">count</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nf">UserRepo</span><span class="p">()</span>
+	<span class="k">return</span> <span class="nx">count</span><span class="p">,</span> <span class="nx">err</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nf">logic</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">countUser</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nf">service</span><span class="p">()</span>
+	<span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+		<span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;original error: %T %v\n&#34;</span><span class="p">,</span> <span class="nx">errors</span><span class="p">.</span><span class="nf">Cause</span><span class="p">(</span><span class="nx">err</span><span class="p">),</span> <span class="nx">errors</span><span class="p">.</span><span class="nf">Cause</span><span class="p">(</span><span class="nx">err</span><span class="p">))</span>
+		<span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;countUser: %d err %+v \n&#34;</span><span class="p">,</span> <span class="nx">countUser</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;get CountUser:&#34;</span><span class="p">,</span> <span class="nx">countUser</span><span class="p">)</span>
+<span class="p">}</span>
+
+</code></pre></div>]]></content>
+		</item>
+		
+		<item>
+			<title>Golang微服务概览</title>
+			<link>https://example.com/posts/golang/golang-micro/</link>
+			<pubDate>Thu, 03 Dec 2020 21:45:53 +0800</pubDate>
+			
+			<guid>https://example.com/posts/golang/golang-micro/</guid>
+			<description>微服务 1. SOA(面向服务)：小即是没、单一职责、尽可能早地创建原型、可移植性比效率更重要 2. 微服务：服务关注单一业务，服务间采用轻量级的通信机</description>
+			<content type="html"><![CDATA[<h2 id="微服务">微服务</h2>
+<pre><code>1. SOA(面向服务)：小即是没、单一职责、尽可能早地创建原型、可移植性比效率更重要
+2. 微服务：服务关注单一业务，服务间采用轻量级的通信机制，可以全自动独立部署。
+3. 微服务优点：原子服务，独立进程，隔离部署，去中心化服务治理。
+4. 缺点：基础设施的建设，复杂度高。 
+5. 串行与并行、分布式一致性
+</code></pre>
+<h3 id="组件服务化">组件服务化</h3>
+<ul>
+<li>多个微服务组合完成了一个完整的用户场景</li>
+</ul>
+<h3 id="网关">网关</h3>
+<ul>
+<li>网关是一种充当转换重任的计算机系统或设备。使用在不同的通信协议、数据格式或语言，甚至体系结构完全不同的两种系统之间，网关是一个翻译器</li>
+</ul>
+<h3 id="去中心化">去中心化</h3>
+<pre><code> 1.数据去中心化 
+ 2.治理去中心化
+ 3.技术去中心化
+</code></pre>
+<h2 id="微服务设计">微服务设计</h2>
+<h3 id="api-gateway网关">API GateWay（网关）</h3>
+<p>Backend for Frontend 面向前端的后端</p>
+<p>Envoy（开源） 专注路由、认证、限流、安全</p>
+<p>业务实际流量：
+移动端-&gt;API Gateway-&gt;BFF（B站 用node.js来做服务端渲染 SSR ）-&gt;Mircoservice</p>
+<h3 id="微服务划分">微服务划分</h3>
+<ol>
+<li>通过业务职能划分</li>
+<li>通过限界上下文来划分（DDD）</li>
+</ol>
+<h4 id="cqrs">CQRS</h4>
+<p>将应用程序分为两部分：命令端和查询端。命令端处理程序创建，更新和删除请求，并在数据更改时发出事件。查询端通过针对一个或多个物化视图执行查询来处理查询，这些物化视图通过订阅数据更改时发出的事件流而保持最新 。</p>
+<p><strong>canal中间件</strong></p>
+<p>订阅mysql的binlog</p>
+]]></content>
+		</item>
+		
+	</channel>
+</rss>

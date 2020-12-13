@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>WilsonJ Blog</title>
+    <link>https://example.com/</link>
+    <description>Recent content on WilsonJ Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
+    <lastBuildDate>Fri, 04 Dec 2020 11:29:59 +0800</lastBuildDate><atom:link href="https://example.com/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Golang Error</title>
+      <link>https://example.com/posts/golang/error/</link>
+      <pubDate>Fri, 04 Dec 2020 11:29:59 +0800</pubDate>
+      
+      <guid>https://example.com/posts/golang/error/</guid>
+      <description>Error的几种定义 Error are value Sentinel Error 预定义错误 Sentinel errors 成为你 API 公共部分。 Sentinel errors 在两个包之间创建了依赖。 结论: 尽可能避免 sentinel errors。 Error Types Error type 是实现了 error</description>
+    </item>
+    
+    <item>
+      <title>Golang微服务概览</title>
+      <link>https://example.com/posts/golang/golang-micro/</link>
+      <pubDate>Thu, 03 Dec 2020 21:45:53 +0800</pubDate>
+      
+      <guid>https://example.com/posts/golang/golang-micro/</guid>
+      <description>微服务 1. SOA(面向服务)：小即是没、单一职责、尽可能早地创建原型、可移植性比效率更重要 2. 微服务：服务关注单一业务，服务间采用轻量级的通信机</description>
+    </item>
+    
+    <item>
+      <title>关于</title>
+      <link>https://example.com/about/</link>
+      <pubDate>Thu, 03 Dec 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://example.com/about/</guid>
+      <description>一名集Golang、PHP双语言的程序小哥哥。</description>
+    </item>
+    
+  </channel>
+</rss>
